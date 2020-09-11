@@ -36,7 +36,7 @@ class ItemListener implements Listener
                     if (time() - $this->dynamite[$player->getRawUniqueId()] <= 0) {
                         $explosion = new Explosion(new Position($directional->asVector3()->add(0,1.3,0)),$size);
                         $explosion->explodeB();
-                        $player->getLevel()->dropItem($player->add(0,1.3,0),Item::get(Item::TNT,0,1),$directional->multiply(0.4),40);
+                        $player->getLevel()->dropItem($player->add(0,1.3,0),Item::get(Item::TNT,0,1),$directional->multiply(0.4),3);
                         $this->dynamite[$player->getRawUniqueId()] = time();
                     }
                     $player->sendMessage(Translation::getMessage("dynamiteProcess",[

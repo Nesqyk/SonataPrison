@@ -25,7 +25,6 @@ class ItemManager
     /**
      * @param UniqueItem $item
      * @param bool $force
-     * @todo idk lol
      */
     public function registerItem(UniqueItem $item,bool $force =false) {
         if (isset($this->items[$item->getLegacyId()]) || ItemFactory::isRegistered($item->getId())) {

@@ -28,9 +28,10 @@ class Dynamite extends UniqueItem
         $nbt = [new StringTag(self::DYNAMITE_ENTRY,"gay"),new IntTag(self::DYNAMITE_SIZE,self::RARE["size"][$dynamite_id])];
         $lore = [];
         $lore[] = C::GRAY."A Throwable item used to break blocks";
-        $lore[] = C::GRAY."";
+        $lore[] = C::GRAY."when it explodes";
+        $lore[] = "";
         $lore[] = c::BOLD.C::RED."Information";
-        $lore[] = c::GRAY."   Explosion Size ".c::BOLD.c::RED.self::RARE["size"][$dynamite_id];
+        $lore[] = c::GRAY."        Explosion Size ".c::BOLD.c::RED.self::RARE["size"][$dynamite_id];
 
         parent::__construct($custom_name, self::TNT, 0, "Dynamite", $lore,$nbt);
     }
