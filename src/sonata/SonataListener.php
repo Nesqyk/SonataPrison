@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sonata;
 
-
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat as C;
+use sonata\traits\TickingTrait;
 use sonata\translation\Translation;
 
 class SonataListener implements Listener

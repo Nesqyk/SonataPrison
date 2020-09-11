@@ -1,6 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sonata\traits;
+
+use sonata\command\CommandManager;
+use sonata\item\ItemManager;
 
 /**
  * Trait ManagerTrait
@@ -9,10 +14,11 @@ namespace sonata\traits;
 trait ManagerTrait {
 
     static $classes = [
-
+        ItemManager::class,
+        CommandManager::class
     ];
 
-    public function initiate() : bool {
+    public function initiateManager() : bool {
         foreach (self::$classes as $class) {
             $base = strtolower(basename($class));
             $class_name = trim($base,"manager");
