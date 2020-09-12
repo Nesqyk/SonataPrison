@@ -10,7 +10,7 @@ final class NumberUtils
      * @return string
      * @see http://php.net/manual/en/function.base-convert.php
      */
-    static function numberToRomanRepresentation($number) {
+    static function toRoman($number) {
         $map = array('M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1);
         $returnValue = '';
         while ($number > 0) {

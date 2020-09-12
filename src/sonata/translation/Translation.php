@@ -9,8 +9,8 @@ use pocketmine\utils\TextFormat;
 final class Translation {
 
     const KEYS = [
-        "playerJoined" => "&1> &b%player",
-        "playerFirstJoin" => "&1>^ &b%player",
+        "playerJoined" => "&2> &a%player",
+        "playerFirstJoin" => "&2^ &a%player",
         "playerQuits" => "&4> &c%player",
         "commandProcess" => self::EC_RED."Wait till %item before executing a command",
         "noPerm" => self::EC_RED."You don't have permission to execute this! ",
@@ -23,10 +23,10 @@ final class Translation {
 
 
     const PICK_AXE = "⛏";
-    const EC_RED = "§8<§c§l!§r§8> §r§7 ";
-    const EC_GREEN = "§8<§a§l!§r§8> §r§7 ";
-    const EC_AQUA = "§8<§b§l!§r§8> §r§7 ";
-    const EC_WHITE= "§8<§f§l!§r§8> §r§7 ";
+    const EC_RED = "§4<§c§l ! §r§4> §r§7 ";
+    const EC_GREEN = "§2<§a§l ! §r§2> §r§7 ";
+    const EC_AQUA = "§1<§b§l ! §r§1> §r§7 ";
+    const EC_WHITE= "§8<§f§l ! §r§8> §r§7 ";
 
     /**
      * @param string $k

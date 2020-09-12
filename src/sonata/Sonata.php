@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace sonata;
 
 use pocketmine\plugin\PluginBase;
+use sonata\database\Database;
 use sonata\traits\ManagerTrait;
 
 class Sonata extends PluginBase {
@@ -15,10 +16,12 @@ class Sonata extends PluginBase {
     protected static $instance;
 
     /** @var array  */
-    private const files = ["changelog.yml"];
+    private const files = ["changelog.yml","database/database.yml"];
 
     /** @var array  */
-    private const dir = [];
+    private const dir = ["/database/"];
+
+    private $database;
 
     public function onEnable()
     {
@@ -41,7 +44,7 @@ class Sonata extends PluginBase {
     }
 
     public function initiate_all() {
-        if (!$this->initiateManager() || !$this->initiate_listener()) {
+        if (!$this->initiateManager() || !$this->initiate_listener() || !$this->initiateGlob()) {
             $this->getServer()->shutdown();
         }
 
@@ -50,28 +53,38 @@ class Sonata extends PluginBase {
         $this->getLogger()->notice("Initiating Listener(s) was Successful");
         $this->initiate_listener();
         usleep(2000);
-        $this->getLogger()->notice("Initiating Manager(s) was Successful");
+        $this->getLogger()->notice("Initiating Manager|Glob(s) was Successful");
         $this->initiateManager();
+        $this->initiateGlob();
     }
 
     public function save_file() {
         foreach (self::dir as $dir) {
-            if (!is_dir($this->getDataFolder().$dir)) return;
-            $dirr =  explode("/",$dir);
-            if ($dirr != null) {
-                mkdir($this->getDataFolder().$dir);
+            if (empty(self::dir)) {
+                return;
             }
+            if (!is_dir($this->getDataFolder().$dir)) return;
+
+            if (!strpos($dir,"/")) {
+                return;
+            }
+            @mkdir($this->getDataFolder().$dir);
 
             foreach (self::files as $file) {
-                $extension = explode(".",$file);
-                if ($extension == null) {
-                    throw new \InvalidArgumentException("invalid file extension on null");
+                if (!empty(self::dir)) {
+                    if (!strpos($file,".")) {
+                        return;
+                    }
+                    $this->saveResource($file);
                 }
-                $this->saveResource($file);
             }
         }
     }
 
+    public function getDatabase() : Database{
+        return $this->database;
+    }
+    
     /**
      * @param string $name
      * @param $class
@@ -84,3 +97,6 @@ class Sonata extends PluginBase {
         return self::$instance;
     }
 }
+
+
+// todo ROLES : Copper,Bronze,

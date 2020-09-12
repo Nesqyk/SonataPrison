@@ -17,7 +17,7 @@ class CommandManager
     }
 
     public function init() {
-        $this->register(new GiveDynamiteCommand());
+
     }
 
     /**

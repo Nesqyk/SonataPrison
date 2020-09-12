@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace sonata;
 
 use pocketmine\Player;
-use sonata\database\Database;
+use sonata\utils\DatabaseQuery;
 
-class SonataPlayer extends Player
+class SonataPlayer extends Player implements DatabaseQuery
 {
-    public function addMoney(int $amount) {
-        $currents = ["money" => $amount];
-        Database::getInstance()->update($this,$currents);
+    public function getScoreboard() : int {
+
     }
 }
