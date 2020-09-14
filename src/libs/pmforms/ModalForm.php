@@ -34,28 +34,27 @@ class ModalForm extends BaseForm{
 
 	/** @var string */
 	private $content;
-	/** @var \Closure */
-	private $onSubmit;
+
 	/** @var string */
 	private $button1;
 	/** @var string */
 	private $button2;
 
-	/**
-	 * @param string   $title Text to put on the title of the dialog.
-	 * @param string   $text Text to put in the body.
-	 * @param \Closure $onSubmit signature `function(Player $player, bool $choice)`
-	 * @param string   $yesButtonText Text to show on the "Yes" button. Defaults to client-translated "Yes" string.
-	 * @param string   $noButtonText Text to show on the "No" button. Defaults to client-translated "No" string.
-	 */
-	public function __construct(string $title, string $text, \Closure $onSubmit, string $yesButtonText = "gui.yes", string $noButtonText = "gui.no"){
+    /**
+     * @param string $title Text to put on the title of the dialog.
+     * @param string $text Text to put in the body.
+     * @param string $yesButtonText Text to show on the "Yes" button. Defaults to client-translated "Yes" string.
+     * @param string $noButtonText Text to show on the "No" button. Defaults to client-translated "No" string.
+     */
+	public function __construct(string $title, string $text, string $yesButtonText = "gui.yes", string $noButtonText = "gui.no"){
 		parent::__construct($title);
 		$this->content = $text;
-		Utils::validateCallableSignature(function(Player $player, bool $choice) : void{}, $onSubmit);
-		$this->onSubmit = $onSubmit;
 		$this->button1 = $yesButtonText;
 		$this->button2 = $noButtonText;
 	}
+
+	public function submit(Player $player,bool $choice) : void {}
+
 
 	public function getYesButtonText() : string{
 		return $this->button1;
@@ -69,8 +68,7 @@ class ModalForm extends BaseForm{
 		if(!is_bool($data)){
 			throw new FormValidationException("Expected bool, got " . gettype($data));
 		}
-
-		($this->onSubmit)($player, $data);
+		$this->submit($player,$data);
 	}
 
 	protected function getType() : string{

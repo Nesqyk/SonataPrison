@@ -2,101 +2,112 @@
 
 declare(strict_types=1);
 
-
 namespace sonata;
 
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\Task;
+use pocketmine\utils\TextFormat as C;
+use ReflectionException;
 use sonata\database\Database;
 use sonata\traits\ManagerTrait;
 
-class Sonata extends PluginBase {
+class Sonata extends PluginBase
+{
     use ManagerTrait;
 
-    /** @var self */
-    protected static $instance;
+    /** @var array  */
+    private $files = [];
 
     /** @var array  */
-    private const files = ["changelog.yml","database/database.yml"];
+    private $dir = ["database/"];
 
-    /** @var array  */
-    private const dir = ["/database/"];
-
+    /** @var Database */
     private $database;
 
     public function onEnable()
     {
-        $this->initiate_all();
-        self::$instance = $this;
-        $this->save_file();
+        $this->initiateAll();
+    }
+
+    public function initiateAll() {
+        if ($this->initiateFiles() || $this->initiateManagers()) {
+            $this->getLogger()->info("Initiated Managers");
+            $this->getLogger()->info("Initiated Files");
+
+            $this->getScheduler()->scheduleRepeatingTask(new class($this) extends Task {
+
+                public $PREFIX = "§o§b Sonata Prison :§r ";
+
+                private $sonata;
+
+                public function __construct(Sonata $sonata)
+                {
+                    $this->sonata = $sonata;
+                }
+
+                public function onRun(int $currentTick)
+                {
+                    $random = ['b','2',9];
+                    $message = ['Prestige !','Gangs !','and Much more!'];
+                    $messages = $this->PREFIX.c::ESCAPE.$random[array_rand($random)].$message[array_rand($message)];
+                    $this->sonata->getServer()->getNetwork()->setName($messages);
+                }
+            },20);
+        }else{
+            $this->getServer()->shutdown();
+        }
+    }
+
+
+    /**
+     * @param $class
+     * @return bool
+     * @throws ReflectionException
+     */
+    // don't use dis if not actually need
+    static function debug($class) {
+        $reflection = new \ReflectionClass($class);
+        $debug = false;
+        (new self)->getLogger()->info("Debugging ".basename($class)."...");
+
+        if ($debug) {
+            $debug_M = var_dump($class,$reflection->getEndLine(),$_REQUEST);
+            (new self)->getLogger()->info("debugged ".basename($class).$debug_M);
+            $debug = true;
+        }
+        return $debug;
+    }
+
+    public function getDatabase() : Database {
+        return  $this->database;
     }
 
     /**
      * @return bool
      */
-    public function initiate_listener() : bool {
-        try {
-            $this->getServer()->getPluginManager()->registerEvents(new SonataListener(),$this);
-        }catch (\Exception $exception) {
-            $this->getLogger()->notice("Failed to initiate {$exception->getFile()} :".$exception->getTraceAsString());
-            return  false;
-        }
-        return  true;
-    }
-
-    public function initiate_all() {
-        if (!$this->initiateManager() || !$this->initiate_listener() || !$this->initiateGlob()) {
-            $this->getServer()->shutdown();
-        }
-
-        $this->getLogger()->notice("Initiating All Stuffs");
-        usleep(2000);
-        $this->getLogger()->notice("Initiating Listener(s) was Successful");
-        $this->initiate_listener();
-        usleep(2000);
-        $this->getLogger()->notice("Initiating Manager|Glob(s) was Successful");
-        $this->initiateManager();
-        $this->initiateGlob();
-    }
-
-    public function save_file() {
-        foreach (self::dir as $dir) {
-            if (empty(self::dir)) {
-                return;
-            }
-            if (!is_dir($this->getDataFolder().$dir)) return;
-
-            if (!strpos($dir,"/")) {
-                return;
-            }
-            @mkdir($this->getDataFolder().$dir);
-
-            foreach (self::files as $file) {
-                if (!empty(self::dir)) {
-                    if (!strpos($file,".")) {
-                        return;
-                    }
-                    $this->saveResource($file);
+    public function initiateFiles() : bool {
+        foreach ($this->files as $file) {
+            foreach ($this->dir as $dir) {
+                if (strpos($file,'.') === false || strpos($dir,'/') === false){
+                    return false;
+                }
+                $this->saveResource($file);
+                if (!is_dir($this->getDataFolder().$dir)) {
+                    mkdir($this->getDataFolder().$dir);
                 }
             }
         }
+        return true;
     }
 
-    public function getDatabase() : Database{
-        return $this->database;
-    }
-    
     /**
-     * @param string $name
-     * @param $class
+     * @return Sonata|null
      */
-    private function setManager(string $name,$class) {
-        $this->{$name} = $class;
-    }
-
-    public static function getInstance() {
-        return self::$instance;
+    public static function getInstance() : self {
+        $instance = null;
+        if ($instance) {
+            $instance = new self;
+        }
+        return $instance;
     }
 }
-
-
-// todo ROLES : Copper,Bronze,

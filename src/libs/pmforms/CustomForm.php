@@ -34,20 +34,13 @@ class CustomForm extends BaseForm{
 	private $elements;
 	/** @var CustomFormElement[] */
 	private $elementMap = [];
-	/** @var \Closure */
-	private $onSubmit;
-	/** @var \Closure|null */
-	private $onClose = null;
 
-	/**
-	 * @param string              $title
-	 * @param CustomFormElement[] $elements
-	 * @param \Closure            $onSubmit signature `function(Player $player, CustomFormResponse $data)`
-	 * @param \Closure|null       $onClose signature `function(Player $player)`
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function __construct(string $title, array $elements, \Closure $onSubmit, ?\Closure $onClose = null){
+
+    /**
+     * @param string $title
+     * @param CustomFormElement[] $elements
+     */
+	public function __construct(string $title, array $elements){
 		parent::__construct($title);
 		$this->elements = array_values($elements);
 		foreach($this->elements as $element){
@@ -57,14 +50,13 @@ class CustomForm extends BaseForm{
 			$this->elementMap[$element->getName()] = $element;
 		}
 
-		Utils::validateCallableSignature(function(Player $player, CustomFormResponse $response) : void{}, $onSubmit);
-		$this->onSubmit = $onSubmit;
-		if($onClose !== null){
-			Utils::validateCallableSignature(function(Player $player) : void{}, $onClose);
-			$this->onClose = $onClose;
-		}
 	}
 
+
+	public function submit(Player $player,CustomFormResponse $response) : void {}
+
+
+	public function close(Player $player) : void {}
 	/**
 	 * @param int $index
 	 *
@@ -92,9 +84,7 @@ class CustomForm extends BaseForm{
 
 	final public function handleResponse(Player $player, $data) : void{
 		if($data === null){
-			if($this->onClose !== null){
-				($this->onClose)($player);
-			}
+			$this->close($player);
 		}elseif(is_array($data)){
 			if(($actual = count($data)) !== ($expected = count($this->elements))){
 				throw new FormValidationException("Expected $expected result data, got $actual");
@@ -115,8 +105,7 @@ class CustomForm extends BaseForm{
 				}
 				$values[$element->getName()] = $value;
 			}
-
-			($this->onSubmit)($player, new CustomFormResponse($values));
+			$this->submit($player,new CustomFormResponse($data));
 		}else{
 			throw new FormValidationException("Expected array or null, got " . gettype($data));
 		}

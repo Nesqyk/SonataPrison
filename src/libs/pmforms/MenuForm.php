@@ -38,26 +38,23 @@ class MenuForm extends BaseForm{
 	/** @var MenuOption[] */
 	private $options;
 
-	/** @var \Closure|null */
-	private $onClose = null;
 
     /**
      * @param string $title
      * @param string $text
      * @param MenuOption[] $options
-     * @param \Closure|null $onClose signature `function(Player $player)`
      */
-	public function __construct(string $title, string $text, array $options, ?\Closure $onClose = null){
+	public function __construct(string $title, string $text, array $options){
 		parent::__construct($title);
 		$this->content = $text;
 		$this->options = array_values($options);
-		if($onClose !== null){
-			Utils::validateCallableSignature(function(Player $player) : void{}, $onClose);
-			$this->onClose = $onClose;
-		}
 	}
 
     public function submit(Player $player,int $selectedOption) : void {
+
+    }
+
+    public function close(Player $player) {
 
     }
 
@@ -67,9 +64,7 @@ class MenuForm extends BaseForm{
 
 	final public function handleResponse(Player $player, $data) : void{
 		if($data === null){
-			if($this->onClose !== null){
-				($this->onClose)($player);
-			}
+				$this->close($player);
 		}elseif(is_int($data)){
 			if(!isset($this->options[$data])){
 				throw new FormValidationException("Option $data does not exist");
