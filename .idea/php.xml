@@ -3,6 +3,7 @@
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/../Phar" />
+      <path value="$USER_HOME$/Downloads/libasynql-master/libasynql-master/libasynql/src/poggit" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />

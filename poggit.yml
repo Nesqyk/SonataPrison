@@ -1,0 +1,12 @@
+--- # Poggit-CI Manifest. Open the CI at no
+branches:
+  - master
+projects:
+  Op.25.11:
+    path: ""
+    libs:
+      - src: poggit/libasynql/libasynql
+        version: ^3.2.1
+    lint:
+      phpstan: false
+...
