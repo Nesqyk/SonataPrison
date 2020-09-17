@@ -27,7 +27,7 @@ final class Translation
         }
         $str = self::MSG[$key];
         if (empty($str)){
-            $str = self::RED."Why i'm empty!?";
+            $str = self::RED."Why am i empty!?";
         }
         foreach ($replacement as $k => $v) {
             $str = str_replace("%$k",$v,$str);

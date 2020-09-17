@@ -20,4 +20,28 @@ final class Utils
         }
         return $return;
     }
+
+    /**
+     * @param int $time
+     * @return mixed
+     */
+    static function convertMilitaryToDefault(int $time) {
+        $format = [];
+        for ($ii = 13; $ii < 24; $ii ++) {
+            for ($i = 1;$i < 12;$i ++) {
+                $format = array($ii => $i);
+            }
+        }
+        return $format[$time];
+    }
+
+    /**
+     * @param int $time
+     * @return string
+     */
+    static function convertToAmPm(int $time) {
+        $am = range(1,12);
+        $pm = range(13,24);
+        return $am[$time] !== $pm[$time] ? "AM" : "PM";
+    }
 }

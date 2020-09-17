@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace core\session\sort;
 
 use core\provider\ProviderManager;
+use core\traits\SonataInstance;
 use core\utils\Utils;
+use Exception;
 use pocketmine\Player;
 
 /**
@@ -14,6 +14,8 @@ use pocketmine\Player;
  */
 class PlayerSession
 {
+    use SonataInstance;
+
     /** @var Player  */
     private $player;
 
@@ -31,6 +33,9 @@ class PlayerSession
 
     /** @var int */
     private $scoreboard;
+
+    /** @var int */
+    private $booster;
 
     /** @var array  */
     static $RANK_ID_STRING = [
@@ -54,7 +59,7 @@ class PlayerSession
      */
     public function getMoney(bool $th_place = false) {
        if ($th_place) {
-           return $this->money;
+           return floatval($this->money);
        }
        return Utils::convertToThPlace($this->money);
     }
@@ -99,9 +104,7 @@ class PlayerSession
         $string = "";
         if (isset($letters[$number])) {
             $string = $letters[$number];
-            if ($number === 27) {
-                $string = 'free';
-            }
+            $string = $number === 27 ? 'free' : $string;
         }
         return strtoupper($string);
     }
@@ -110,13 +113,67 @@ class PlayerSession
 
     }
 
+
+    /**
+     * @param bool $to_string
+     * @return false|float|string
+     */
+    public function getBooster(bool $to_string = false) {
+        $format =  number_format($this->booster,0,"."," ");
+        if ($to_string) {
+            $format= round($this->booster,2);
+            return  $format;
+        }
+        $format .= 'x';
+        return $format;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getFirstJoinString() : string {
+        $time_stamp = $this->getPlayer()->getFirstPlayed() - microtime() * 1/1000;
+        $date = new \DateTime();
+        $date->setTimestamp($time_stamp);
+        return $date->format(DATE_RFC3339_EXTENDED);
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getLastSeenString() : string  {
+        $time_stamp = $this->getPlayer()->getLastPlayed() - microtime() * 1/1000;
+        $date = new \DateTime();
+        $date->setTimestamp($time_stamp);
+        $last_seen = "Now!";
+
+        // Conditional :rolling_eyes:
+        if ($date->format("d") === 365) {
+            // F man
+            $last_seen = $date->format(DATE_RFC3339_EXTENDED);
+        }
+        if ($date->format("d") !== 365) {
+            $last_seen = $date->format("d")."day(s) ago";
+        }
+        if ($date->format("i") >= 60) {
+            $last_seen = $date->format("i")." minute(s) ago";
+        }
+        if ($date->format("h") <= 24) {
+            $last_seen = $date->format("H")." hour(s) ago";
+        }
+
+        return $last_seen;
+    }
+
     // initiate player like insert em yea register it.
     public function initiate() {
-        ProviderManager::p_insert($this->player->getUniqueId()->toString(),$this->player->getName());
+        $this->provider()->p_insert($this->player->getUniqueId()->toString(),$this->player->getUniqueId()->toString());
     }
 
     // chane the player things yea.
     public function update() {
-        ProviderManager::p_change($this->getPlayer(),$this->getMoney(),$this->getRankId(),$this->getPrestige(),$this->getMine(),$this->getScoreboard());
+        $this->provider()->p_change($this->getPlayer(),$this->getMoney(),$this->getRankId(),$this->getPrestige(),$this->getMine(),$this->getScoreboard(),$this->getBooster());
     }
 }
