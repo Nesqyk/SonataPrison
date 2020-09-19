@@ -9,12 +9,16 @@ use pocketmine\utils\TextFormat as c;
 final class Translation
 {
     const MSG = [
-        "noPermission" => self::RED."You have no Permission to Execute this Action!"
+        "noPermission" => self::RED."You have no Permission to Execute this Action!",
+        "needMoreMoney" => self::RED."You need more "
     ];
 
-    const EMPTY = "‏‏‎ ‎";
-    const AQUA = "§2[§bSONATA§2] §b ";
-    const RED = "§4§[§cSONATA§4] §c ";
+    // Bedrock ya knoe for win10
+    const PERCENTAGE = "%%%%%%%";
+    // for items ya :)
+    const EMPTY = "‎";
+    const AQUA = "§l§b[] §7";
+    const RED = "§4§[§cSONATA§4] §7 ";
 
     /**
      * @param string $key
@@ -26,11 +30,15 @@ final class Translation
             throw new \InvalidArgumentException("invalid key $key");
         }
         $str = self::MSG[$key];
-        if (empty($str)){
-            $str = self::RED."Why am i empty!?";
-        }
-        foreach ($replacement as $k => $v) {
-            $str = str_replace("%$k",$v,$str);
+        if (!empty($replacement)) {
+            $sub = explode("&",$str);
+            $str = c::RESET.c::GRAY.$sub[1];
+            foreach ($replacement as $k => $v) {
+                $k  = "%".$k;
+                if (strpos($k,"%") !== false) {
+                    $str = str_replace($k,$v,$str);
+                }
+            }
         }
         return C::colorize($str);
     }

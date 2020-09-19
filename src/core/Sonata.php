@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace core;
 
 use core\provider\ProviderManager;
+use core\session\SessionManager;
 use core\traits\ClassManager;
 use pocketmine\plugin\PluginBase;
 
@@ -15,10 +16,13 @@ final class Sonata extends PluginBase
     /** @var self|null  */
     static $instance = null;
 
+    /** Random Properties */
     private $files = ["db.yml"];
     private $dir = ["gay"];
 
+    /** Manager's Properties */
     private $providerManager;
+    private $sessionManager;
 
     // todo Split dis and make a cool animation lel
     const NAMES = [
@@ -31,6 +35,7 @@ final class Sonata extends PluginBase
         self::$instance = $this;
         if ($this->initiateManager()) {
             $this->getLogger()->notice("Initiated Manager(s) successfully");
+            $this->getLogger()->notice("Initiated Listener(s) successfully");
         }else{
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
@@ -51,6 +56,10 @@ final class Sonata extends PluginBase
                 }
             }
         }
+    }
+
+    public function getSessionManager() : SessionManager {
+        return  $this->sessionManager;
     }
 
     public function getProviderManager() : ProviderManager{

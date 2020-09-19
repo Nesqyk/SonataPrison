@@ -10,6 +10,5 @@ abstract class Mine extends Task
 {
     public function __construct(string $name,string $level,array $pos1,array $pos2)
     {
-
     }
 }

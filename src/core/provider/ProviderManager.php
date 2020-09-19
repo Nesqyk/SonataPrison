@@ -52,14 +52,13 @@ class ProviderManager
     }
 
     /**
-     * @param string $uuid player's uuid
-     * @param string $username player's username
+     * @param Player $player
      */
-    // i could've change the param into Player but no
-    public function p_insert(string $uuid,string $username) {
+    // entry for player
+    public function p_insert(Player $player) {
        $connector = $this->connector;
        if (isset($connector)) {
-           $connector->executeInsert(self::P_QUERY_INSERT,["uuid" => $uuid,"name" => $username]);
+           $connector->executeInsert(self::P_QUERY_INSERT,["c_uuid" => $player->getUniqueId()->toString(),"c_name" => $player->getName()]);
        }
     }
 
@@ -70,12 +69,12 @@ class ProviderManager
      * @param int $prestige Player's updated prestige
      * @param int $mine Player's updated mine
      * @param int $scoreboard Player's update scoreboard
-     * @param int $booster Player's updated booster
+     * @param int $multiplier Player's updated multiplier
      */
     // did somebody said birthmark?
-    public function p_change(Player $player,int $money,int $rank,int $prestige,int $mine,int $scoreboard,int $booster) {
+    public function p_change(Player $player,int $money,int $rank,int $prestige,int $mine,int $scoreboard,int $multiplier) {
         $connector = $this->connector;
-        $connector->executeChange(self::P_QUERY_CHANGE,["c_money" => $money, "c_username" => $player->getName(), "c_rank" => $rank, "c_prestige" => $prestige, "c_mine" => $mine,"c_scoreboard" => $scoreboard,"c_booster" => $booster]);
+        $connector->executeChange(self::P_QUERY_CHANGE,["c_money" => $money, "c_username" => $player->getName(), "c_rank" => $rank, "c_prestige" => $prestige, "c_mine" => $mine,"c_scoreboard" => $scoreboard,"c_multiplier" => $multiplier]);
     }
 
     /**

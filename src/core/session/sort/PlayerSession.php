@@ -2,7 +2,6 @@
 
 namespace core\session\sort;
 
-use core\provider\ProviderManager;
 use core\traits\SonataInstance;
 use core\utils\Utils;
 use Exception;
@@ -35,7 +34,7 @@ class PlayerSession
     private $scoreboard;
 
     /** @var int */
-    private $booster;
+    private $multiplier;
 
     /** @var array  */
     static $RANK_ID_STRING = [
@@ -45,23 +44,24 @@ class PlayerSession
 
     public function __construct(Player $player)
     {
-        $this->initiate();
         $this->player = $player;
+        // put this always at last or else null :|
+        $this->initiate();
     }
 
     public function getPlayer() {
         return $this->player;
     }
 
+    public function setMine(int $mine) {
+        $this->mine += $mine;
+    }
+
     /**
-     * @param bool $th_place to string or no
-     * @return int|string returns rank id | thousand place
+     * @return int player`s money
      */
-    public function getMoney(bool $th_place = false) {
-       if ($th_place) {
-           return floatval($this->money);
-       }
-       return Utils::convertToThPlace($this->money);
+    public function getMoney() {
+       return  $this->money;
     }
 
     /**
@@ -75,6 +75,38 @@ class PlayerSession
         return self::$RANK_ID_STRING[$this->rank_id];
     }
 
+    // 24,000,000
+    public function getPrice(int $mine) {
+        $range = range(1,27);
+        $slice = range(1,24000000);
+        asort($slice);
+        for ($i = 1 ; $i < 24000000; $i ++) {
+            $range[] = array_slice($slice,$i);
+        }
+        return $range[$mine];
+    }
+
+    /**
+     * lol
+     * @param $int
+     */
+    public function rankUp($int) {
+        $this->mine += $int;
+    }
+
+    /**
+     * @return int|mixed|string|null
+     */
+    public function getCurrentRemaining() {
+        return isset(self::$MINE_PRICES[$this->mine]) ? self::$MINE_PRICES[$this->mine] - $this->getMoney(): null;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getCurrentNeeded() {
+        return isset(self::$MINE_PRICES[$this->mine]) ? self::$MINE_PRICES[$this->mine] : null;
+    }
 
     public function getPrestige() {
         return $this->prestige;
@@ -109,20 +141,15 @@ class PlayerSession
         return strtoupper($string);
     }
 
-    public function getChatFormat() {
-
-    }
-
 
     /**
      * @param bool $to_string
      * @return false|float|string
      */
-    public function getBooster(bool $to_string = false) {
-        $format =  number_format($this->booster,0,"."," ");
+    public function getMultiplier(bool $to_string = false) {
+        $format =  number_format($this->multiplier,0,"."," ");
         if ($to_string) {
-            $format= round($this->booster,2);
-            return  $format;
+            $format= round($this->multiplier,2);
         }
         $format .= 'x';
         return $format;
@@ -133,7 +160,7 @@ class PlayerSession
      * @throws Exception
      */
     public function getFirstJoinString() : string {
-        $time_stamp = $this->getPlayer()->getFirstPlayed() - microtime() * 1/1000;
+        $time_stamp = $this->getPlayer()->getFirstPlayed() - 1400 * 1/1000;
         $date = new \DateTime();
         $date->setTimestamp($time_stamp);
         return $date->format(DATE_RFC3339_EXTENDED);
@@ -144,7 +171,7 @@ class PlayerSession
      * @throws Exception
      */
     public function getLastSeenString() : string  {
-        $time_stamp = $this->getPlayer()->getLastPlayed() - microtime() * 1/1000;
+        $time_stamp = $this->getPlayer()->getLastPlayed() - 1400 * 1/1000;
         $date = new \DateTime();
         $date->setTimestamp($time_stamp);
         $last_seen = "Now!";
@@ -154,13 +181,13 @@ class PlayerSession
             // F man
             $last_seen = $date->format(DATE_RFC3339_EXTENDED);
         }
-        if ($date->format("d") !== 365) {
+        if ($date->format("d") >= 365) {
             $last_seen = $date->format("d")."day(s) ago";
         }
         if ($date->format("i") >= 60) {
             $last_seen = $date->format("i")." minute(s) ago";
         }
-        if ($date->format("h") <= 24) {
+        if ($date->format("h") >= 24) {
             $last_seen = $date->format("H")." hour(s) ago";
         }
 
@@ -169,11 +196,17 @@ class PlayerSession
 
     // initiate player like insert em yea register it.
     public function initiate() {
-        $this->provider()->p_insert($this->player->getUniqueId()->toString(),$this->player->getUniqueId()->toString());
+        $this->provider()->p_insert($this->getPlayer());
     }
 
     // chane the player things yea.
     public function update() {
-        $this->provider()->p_change($this->getPlayer(),$this->getMoney(),$this->getRankId(),$this->getPrestige(),$this->getMine(),$this->getScoreboard(),$this->getBooster());
+        $this->provider()->p_change($this->getPlayer(),$this->getMoney(),$this->getRankId(),$this->getPrestige(),$this->getMine(),$this->getScoreboard(),$this->getMultiplier());
+    }
+
+    public function jsonSerialize() {
+        return [
+            "money" => Utils::convertToThPlace($this->money),
+        ];
     }
 }
